@@ -124,8 +124,7 @@ plt.axis("off")
 
 # Mostrar imagen traspuesta
 plt.subplot(1, 2, 2)
-# TODO:  esa transposicion ahi quedo rara
-plt.imshow(cv2.cvtColor(img_mclaren_transpose, cv2.COLOR_BGR2RGB))
+plt.imshow(img_mclaren_transpose)
 plt.title("McLaren Traspuesta")
 plt.axis("off")
 
@@ -183,4 +182,119 @@ if tiene_inv(gray_ferrari):
 inv_mclaren
 # %%
 inv_ferrari
+
+
+# %%
+# Función para ajustar el contraste de una imagen multiplicando por un escalar α
+def ajustar_contraste(img, alpha):
+    # Multiplicamos la imagen por el escalar α
+    img_ajustada = img * alpha
+
+    # Usamos np.clip para restringir los valores entre 0 y 255
+    img_ajustada = np.clip(img_ajustada, 0, 255).astype(np.uint8)
+
+    return img_ajustada
+
+
+# %%
+# Función principal para probar ambos casos
+def cambiar_contraste_imagen(img_path, alpha1, alpha2):
+    # Cargar la imagen
+    img = cv2.imread(img_path)
+
+    # Convertir la imagen a RGB para mostrarla con matplotlib
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    # CASO 1: α > 1 (aumenta el contraste)
+    img_caso1 = ajustar_contraste(img_rgb, alpha1)
+
+    # CASO 2: 0 < α < 1 (reduce el contraste)
+    img_caso2 = ajustar_contraste(img_rgb, alpha2)
+
+    # Mostrar la imagen original y los dos casos
+    plt.figure(figsize=(15, 5))
+
+    # Imagen original
+    plt.subplot(1, 3, 1)
+    plt.imshow(img_rgb)
+    plt.title("Imagen Original")
+    plt.axis("off")
+
+    # Imagen con α > 1 (aumenta el contraste)
+    plt.subplot(1, 3, 2)
+    plt.imshow(img_caso1)
+    plt.title(f"Contraste aumentado (α={alpha1})")
+    plt.axis("off")
+
+    # Imagen con 0 < α < 1 (reduce el contraste)
+    plt.subplot(1, 3, 3)
+    plt.imshow(img_caso2)
+    plt.title(f"Contraste reducido (α={alpha2})")
+    plt.axis("off")
+
+    plt.show()
+
+
+# %%
+# Parámetros de los casos
+alpha1 = 1.5  # CASO 1: α > 1
+alpha2 = 0.5  # CASO 2: 0 < α < 1
+# Llamada a la función con una imagen de ejemplo
+cambiar_contraste_imagen("mclaren_rec.jpg", alpha1, alpha2)
+
+
+# %%
+def generar_w(img):
+    # Obtener las dimensiones de la imagen
+    filas = img.shape[0]
+
+    # Generar la matriz identidad del tamaño de la imagen (solo cuenta el tamaño de las filas y columnas)
+    identidad = np.eye(filas)
+
+    # Voltear la matriz identidad horizontalmente (para obtener la anti-diagonal)
+    W = np.fliplr(identidad)
+    return W
+
+
+# %%
+w = generar_w(mclaren_rec)
+pa_un_lado = w.dot(mclaren_rec)
+pal_otro = mclaren_rec.dot(w)
+# %%
+pa_un_lado
+# %%
+pal_otro
+
+
+# %%
+def calcular_negativo(img):
+    # Crear una matriz de 255 del mismo tamaño que la imagen
+    matriz_255 = np.full(img.shape, 255)
+
+    # Calcular el negativo de la imagen restando img de la matriz 255
+    negativo_img = matriz_255 - img
+
+    # Asegurarse de que los valores estén dentro del rango [0, 255]
+    negativo_img = np.clip(negativo_img, 0, 255).astype(np.uint8)
+
+    return negativo_img
+
+
+# %%
+mc_neg = calcular_negativo(mclaren_rec)
+# %%
+# Imagen original
+plt.subplot(1, 2, 1)
+plt.imshow(mclaren_rec)
+plt.title("Imagen Original")
+plt.axis("off")
+
+# Imagen negativa
+plt.subplot(1, 2, 2)
+plt.imshow(mc_neg)
+plt.title("Imagen Negativa")
+plt.axis("off")
+
+plt.show()
+
 # %%
