@@ -1,10 +1,10 @@
 # %%
-import os
+# import os
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from skimage.io import imread, imshow
+from skimage.io import imread  # , imshow
 
 
 # %%
@@ -119,13 +119,16 @@ plt.title("Ferrari")
 plt.axis("off")
 
 plt.show()
+# %% [markdown]
+# ### 4- Mostrar una de las imágenes como matriz (Mclaren)
+
 # %%
-# Mostrar una de las imágenes como matriz (Mclaren)
 print("Matriz de la imagen McLaren:\n", mclaren_rec)
 print("Tamaño de la imagen McLaren:", mclaren_rec.shape)
-# %%
-# Calcular la matriz traspuesta de la imagen McLaren
+# %% [markdown]
+# ### 5- Calcular la matriz traspuesta de las imagenes
 # Solo se intercambian las coordenadas x, y (eje 0 y 1), dejando el eje z igual
+# %%
 img_mclaren_transpose = np.transpose(mclaren_rec, (1, 0, 2))
 img_ferrari_transpose = np.transpose(ferrari_rec, (1, 0, 2))
 # Mostrar la matriz traspuesta
@@ -152,7 +155,6 @@ plt.axis("off")
 
 plt.show()
 # %%
-# Mostrar la imagen original y su traspuesta
 plt.figure(figsize=(10, 5))
 
 # Mostrar imagen original
@@ -168,17 +170,15 @@ plt.title("Ferrari Traspuesta")
 plt.axis("off")
 
 plt.show()
+# %% [markdown]
+# ### 6- Convertir ambas imágenes a escala de grises y mostrar el recorte
+
+
 # %%
-# Comentario sobre los resultados:
-# La imagen traspuesta intercambia las coordenadas x e y. Esto da como resultado una imagen rotada 90 grados.
-
-
-# Convertir ambas imágenes a escala de grises y mostrar el recorte
-# Recorte (puede ser un área central de 100x100 píxeles)
 def convert_to_grayscale(img):
     grayscale = np.mean(img, axis=2)
 
-    # Convert to uint8 to ensure the pixel values remain in the 0-255 range
+    # De esta manera nos aseguramos que sigue en el rango 0-255
     grayscale_image = grayscale.astype(np.uint8)
     return grayscale_image
 
@@ -209,11 +209,13 @@ cv2.imwrite("ferrary_gray.jpg", gray_ferrari)
 cv2.imwrite("mclaren_gray.jpg", gray_mclaren)
 
 
+# %% [markdown]
+# ### 7- Verificar si son invertibles y calcular
 # %%
 def is_invertible(matrix) -> bool:
     det = np.linalg.det(matrix)
 
-    # If it is different from 0, it is invertible
+    # Si el determinante es distinto de 0, es invertible
     return det != 0
 
 
@@ -223,26 +225,14 @@ if is_invertible(gray_mclaren):
 if is_invertible(gray_ferrari):
     inv_ferrari = np.linalg.inv(gray_ferrari)
 
+
+# %% [markdown]
+# ### 8- Producto de una matriz por un escalar
+#
+# Función para ajustar el contraste de una imagen multiplicando por un escalar
 # %%
-# Mostrar McLaren en escala de grises recortada
-plt.subplot(1, 2, 1)
-plt.imshow(inv_mclaren)
-plt.title("McLaren Gris Recortada")
-plt.axis("off")
-
-# Mostrar Ferrari en escala de grises recortada
-plt.subplot(1, 2, 2)
-plt.imshow(inv_ferrari)
-plt.title("Ferrari Gris Recortada")
-plt.axis("off")
-
-plt.show()
-
-
-# %%
-# Función para ajustar el contraste de una imagen multiplicando por un escalar α
 def ajustar_contraste(img, alpha):
-    # Multiplicamos la imagen por el escalar α
+    # Multiplicamos la imagen por el escalar
     img_ajustada = img * alpha
 
     # Usamos np.clip para restringir los valores entre 0 y 255
@@ -252,18 +242,15 @@ def ajustar_contraste(img, alpha):
 
 
 # %%
-# Función principal para probar ambos casos
 def cambiar_contraste_imagen(img_path, alpha1, alpha2):
-    # Cargar la imagen
-    img = cv2.imread(img_path)
+    img_rgb = cv2.imread(img_path)
 
-    # Convertir la imagen a RGB para mostrarla con matplotlib
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    # CASO 1: α > 1 (aumenta el contraste)
+    # CASO 1: α > 1
     img_caso1 = ajustar_contraste(img_rgb, alpha1)
 
-    # CASO 2: 0 < α < 1 (reduce el contraste)
+    # CASO 2: 0 < α < 1
     img_caso2 = ajustar_contraste(img_rgb, alpha2)
 
     # Mostrar la imagen original y los dos casos
@@ -275,13 +262,13 @@ def cambiar_contraste_imagen(img_path, alpha1, alpha2):
     plt.title("Imagen Original")
     plt.axis("off")
 
-    # Imagen con α > 1 (aumenta el contraste)
+    # Imagen con α > 1
     plt.subplot(1, 3, 2)
     plt.imshow(img_caso1)
     plt.title(f"Contraste aumentado (α={alpha1})")
     plt.axis("off")
 
-    # Imagen con 0 < α < 1 (reduce el contraste)
+    # Imagen con 0 < α < 1
     plt.subplot(1, 3, 3)
     plt.imshow(img_caso2)
     plt.title(f"Contraste reducido (α={alpha2})")
@@ -294,8 +281,10 @@ def cambiar_contraste_imagen(img_path, alpha1, alpha2):
 # Parámetros de los casos
 alpha1 = 1.5  # CASO 1: α > 1
 alpha2 = 0.5  # CASO 2: 0 < α < 1
-# Llamada a la función con una imagen de ejemplo
 cambiar_contraste_imagen("mclaren_gray.jpg", alpha1, alpha2)
+
+# %% [markdown]
+# ### 9- Multiplicación de matrices y conmutatividad
 
 
 # %%
@@ -303,7 +292,8 @@ def generar_w(img):
     # Obtener las dimensiones de la imagen
     filas = img.shape[0]
 
-    # Generar la matriz identidad del tamaño de la imagen (solo cuenta el tamaño de las filas y columnas)
+    # Generar la matriz identidad del tamaño de la imagen
+    # (solo cuenta el tamaño de las filas y columnas)
     identidad = np.eye(filas)
 
     # Voltear la matriz identidad horizontalmente (para obtener la anti-diagonal)
@@ -313,24 +303,27 @@ def generar_w(img):
 
 # %%
 w = generar_w(gray_mclaren)
-pa_un_lado = w @ gray_mclaren
-pal_otro = gray_mclaren @ w
+w_x_pic = w @ gray_mclaren
+pic_x_w = gray_mclaren @ w
+
 # %%
 # Imagen original
 plt.subplot(1, 2, 1)
-plt.imshow(pal_otro, cmap="gray")
+plt.imshow(w_x_pic, cmap="gray")
 plt.title("w * imagen")
 plt.axis("off")
 
 # Imagen negativa
 plt.subplot(1, 2, 2)
-plt.imshow(pa_un_lado, cmap="gray")
+plt.imshow(pic_x_w, cmap="gray")
 plt.title("imagen * w")
 plt.axis("off")
 
 plt.show()
 
 
+# %% [markdown]
+# ### 10 - Calcular el negativo de las imagenes
 # %%
 def calcular_negativo(img):
     # Crear una matriz de 255 del mismo tamaño que la imagen
@@ -361,6 +354,3 @@ plt.title("Imagen Negativa")
 plt.axis("off")
 
 plt.show()
-
-
-# %%
